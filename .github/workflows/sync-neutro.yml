@@ -3,8 +3,6 @@ name: Sync → Repo Neutro
 on:
   push:
     branches: [main]
-    paths:
-      - 'index.html'
 
 jobs:
   sync:
