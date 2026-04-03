@@ -16,18 +16,63 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v4
 
-      - name: Preparar archivos a subir
+      - name: Preparar versión principal
         run: |
           mkdir -p public
           cp index.html public/index.html
 
-      - name: Deploy via FTP a Banahosting
+      - name: Deploy lifepluspetspain.com (versión completa)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_PATH }}
+          server-dir: /lifepluspetspain.com/
           local-dir: ./public/
           security: loose
-          log-level: verbose
+          log-level: standard
+
+      - name: Generar versión neutra (sin formulario, sin tienda)
+        run: |
+          mkdir -p neutro
+          cp index.html neutro/index.html
+
+          python3 - <<'EOF'
+          import re
+
+          with open('neutro/index.html', 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          # Eliminar formulario y JS asociado
+          content = re.sub(
+              r'<!--\s*NEUTRO-REMOVE-START\s*-->.*?<!--\s*NEUTRO-REMOVE-END\s*-->',
+              '', content, flags=re.DOTALL
+          )
+          content = re.sub(
+              r'/\*\s*NEUTRO-REMOVE-START\s*\*/.*?/\*\s*NEUTRO-REMOVE-END\s*\*/',
+              '', content, flags=re.DOTALL
+          )
+
+          # Eliminar código de tienda SHVCB5
+          content = content.replace('https://ww1.lifeplus.com/SHVCB5/M/es/es/web-page/products?search=pets',
+                                    'https://ww1.lifeplus.com/es/es/web-page/products?search=pets')
+          content = re.sub(r'https://www\.lifeplus\.com/SHVCB5/S/', 'https://www.lifeplus.com/', content)
+          content = content.replace('ShopID SHVCB5', 'LifePlus International')
+          content = re.sub(r'<strong>SHVCB5</strong>', 'LifePlus International', content)
+
+          with open('neutro/index.html', 'w', encoding='utf-8') as f:
+              f.write(content)
+
+          print("Versión neutra generada OK")
+          EOF
+
+      - name: Deploy vitallinkplus.com (versión neutra)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /vitallinkplus.com/
+          local-dir: ./neutro/
+          security: loose
+          log-level: standard
