@@ -1002,6 +1002,257 @@
     }
 
     /* ===========================
+       GUIDE PREVIEW
+    =========================== */
+    .guide-preview {
+      background:
+        radial-gradient(circle at top right, rgba(139,195,74,0.22), transparent 28%),
+        linear-gradient(180deg, #f8f5ed 0%, #f1ecdf 100%);
+      border-top: 1px solid rgba(27,94,59,0.08);
+      border-bottom: 1px solid rgba(27,94,59,0.08);
+    }
+
+    .guide-preview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 56px;
+      align-items: center;
+    }
+
+    @media (max-width: 960px) {
+      .guide-preview-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    .guide-preview-copy .section-label {
+      background: rgba(27,94,59,0.08);
+      color: var(--green-deep);
+    }
+
+    .guide-preview-copy .section-title {
+      max-width: 12ch;
+      margin-bottom: 18px;
+    }
+
+    .guide-preview-copy .section-subtitle {
+      margin: 0 0 24px;
+      max-width: 60ch;
+    }
+
+    .guide-preview-points {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .guide-preview-point {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-body);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .guide-preview-point strong {
+      color: var(--text-dark);
+    }
+
+    .guide-preview-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green-lime);
+      box-shadow: 0 0 0 7px rgba(139,195,74,0.18);
+      flex-shrink: 0;
+    }
+
+    .guide-preview-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .guide-preview-book {
+      position: relative;
+      max-width: 420px;
+      margin-left: auto;
+      perspective: 1600px;
+    }
+
+    @media (max-width: 960px) {
+      .guide-preview-book {
+        margin-left: 0;
+      }
+    }
+
+    .guide-preview-book::before,
+    .guide-preview-book::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      transform-origin: left center;
+      transition: transform 320ms ease;
+    }
+
+    .guide-preview-book::before {
+      background: rgba(27,94,59,0.10);
+      transform: translate(16px, 16px) rotate(4deg);
+    }
+
+    .guide-preview-book::after {
+      background: rgba(27,94,59,0.07);
+      transform: translate(8px, 8px) rotate(2deg);
+    }
+
+    .guide-preview-card {
+      position: relative;
+      z-index: 1;
+      min-height: 460px;
+      padding: 34px 30px 30px;
+      border-radius: 28px;
+      color: var(--white);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)),
+        linear-gradient(160deg, #0e3d27 0%, #1B5E3B 55%, #2e7d52 100%);
+      box-shadow: 0 26px 60px rgba(27,94,59,0.24);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 320ms ease, box-shadow 320ms ease;
+    }
+
+    .guide-preview-book:hover .guide-preview-card {
+      transform: rotateY(-9deg) rotateX(2deg);
+      box-shadow: 0 34px 70px rgba(27,94,59,0.28);
+    }
+
+    .guide-preview-book:hover::before {
+      transform: translate(20px, 18px) rotate(6deg);
+    }
+
+    .guide-preview-book:hover::after {
+      transform: translate(10px, 10px) rotate(3deg);
+    }
+
+    .guide-preview-card::before {
+      content: '';
+      position: absolute;
+      inset: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.16);
+      pointer-events: none;
+    }
+
+    .guide-preview-card::after {
+      content: '';
+      position: absolute;
+      top: 18px;
+      right: -64px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      filter: blur(2px);
+    }
+
+    .guide-preview-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.88);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .guide-preview-kicker::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-lime);
+      box-shadow: 0 0 0 6px rgba(139,195,74,0.15);
+    }
+
+    .guide-preview-card h3 {
+      font-size: clamp(34px, 5vw, 52px);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      margin: 22px 0 16px;
+      max-width: 7ch;
+    }
+
+    .guide-preview-card p {
+      position: relative;
+      z-index: 1;
+      color: rgba(255,255,255,0.76);
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 30ch;
+      margin-bottom: 24px;
+    }
+
+    .guide-preview-chapters {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .guide-preview-chapters span {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .guide-preview-meta {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .guide-preview-meta strong {
+      display: block;
+      color: var(--white);
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .guide-preview-meta span {
+      display: block;
+      color: rgba(255,255,255,0.70);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 640px) {
+      .guide-preview-card {
+        min-height: auto;
+      }
+
+      .guide-preview-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===========================
        TESTIMONIALS
     =========================== */
     .testimonials {
@@ -1707,6 +1958,7 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#productos" onclick="closeMenu()">Productos</a></li>
         <li><a href="#para-quien" onclick="closeMenu()">Para quién</a></li>
+        <li><a href="guia.html" onclick="closeMenu()">Guía</a></li>
         <li><a href="#testimonios" onclick="closeMenu()">Testimonios</a></li>
         <li><a href="#veterinarios" onclick="closeMenu()">Veterinarios</a></li>
         <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
@@ -1750,6 +2002,9 @@
         <div class="hero-actions fade-in fade-in-delay-3">
           <a href="#productos" class="btn btn-primary">
             🌿 Ver productos
+          </a>
+          <a href="guia.html" class="btn btn-outline">
+            📘 Abrir guía
           </a>
           <a href="#veterinarios" class="btn btn-outline">
             🩺 Para veterinarios
@@ -2119,6 +2374,76 @@
     </div>
   </section>
 
+  <!-- =================== GUIDE PREVIEW =================== -->
+  <section class="guide-preview section" id="guia">
+    <div class="container">
+      <div class="guide-preview-grid">
+        <div class="guide-preview-copy fade-in">
+          <span class="section-label">Guía complementaria</span>
+          <h2 class="section-title">Toda la información del dossier, ahora en una página clara.</h2>
+          <p class="section-subtitle">
+            Hemos convertido el PDF en una guía web más cómoda de consultar: resumen general, fichas por producto, pautas de uso y acceso rápido a la información clave.
+          </p>
+
+          <div class="guide-preview-points">
+            <div class="guide-preview-point">
+              <span class="guide-preview-dot"></span>
+              <span><strong>Resumen rápido:</strong> qué hace cada producto y para qué momento encaja mejor.</span>
+            </div>
+            <div class="guide-preview-point">
+              <span class="guide-preview-dot"></span>
+              <span><strong>Fichas completas:</strong> ingredientes destacados, aplicación y notas de uso.</span>
+            </div>
+            <div class="guide-preview-point">
+              <span class="guide-preview-dot"></span>
+              <span><strong>Lectura cómoda:</strong> diseñada para móvil y escritorio, sin depender del visor PDF.</span>
+            </div>
+          </div>
+
+          <div class="guide-preview-actions">
+            <a href="guia.html" class="btn btn-primary">Ver la guía</a>
+            <a href="guia.html#productos" class="btn btn-outline">Ir a las fichas</a>
+          </div>
+        </div>
+
+        <div class="guide-preview-book fade-in fade-in-delay-2" aria-hidden="true">
+          <div class="guide-preview-card">
+            <span class="guide-preview-kicker">17 páginas convertidas en web</span>
+            <h3>Guía práctica LifePlus Pets</h3>
+            <p>
+              Un formato editorial para consultar digestión, calma, movilidad, premios funcionales, pelaje, cuidado externo y app en una sola lectura.
+            </p>
+
+            <div class="guide-preview-chapters">
+              <span>Calm</span>
+              <span>Digest</span>
+              <span>Move</span>
+              <span>Biscuits</span>
+              <span>Ahiflower Oil</span>
+              <span>Care &amp; Comfort</span>
+              <span>App Pets</span>
+            </div>
+
+            <div class="guide-preview-meta">
+              <div>
+                <strong>7</strong>
+                <span>capítulos prácticos y navegación directa</span>
+              </div>
+              <div>
+                <strong>1</strong>
+                <span>guía única para branded y neutro</span>
+              </div>
+              <div>
+                <strong>100%</strong>
+                <span>lectura web, sin visor pesado ni zoom incómodo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- =================== TESTIMONIALS =================== -->
   <section class="testimonials section" id="testimonios">
     <div class="container">
@@ -2437,6 +2762,7 @@
             <li><a href="#inicio">Inicio</a></li>
             <li><a href="#productos">Productos</a></li>
             <li><a href="#para-quien">Para quién</a></li>
+            <li><a href="guia.html">Guía</a></li>
             <li><a href="#testimonios">Testimonios</a></li>
             <li><a href="#veterinarios">Veterinarios</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -2449,6 +2775,7 @@
           <ul class="footer-links">
             <li><a href="#veterinarios">Programa Partners</a></li>
             <li><a href="https://www.lifeplus.com/SHVCB5/S/" target="_blank" rel="noopener">Tienda oficial</a></li>
+            <li><a href="guia.html">Guía complementaria</a></li>
             <li><a href="#faq">Preguntas frecuentes</a></li>
             <li><a href="#blog">Blog &amp; Educación</a></li>
           </ul>

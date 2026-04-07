@@ -6,7 +6,9 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'guia.html'
       - 'CNAME'
+      - 'assets/**'
 
 jobs:
   deploy:
@@ -20,6 +22,8 @@ jobs:
         run: |
           mkdir -p public
           cp index.html public/index.html
+          cp guia.html public/guia.html
+          if [ -d assets ]; then cp -R assets public/; fi
 
       - name: Deploy lifepluspetspain.com (versión completa)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -36,34 +40,36 @@ jobs:
         run: |
           mkdir -p neutro
           cp index.html neutro/index.html
+          cp guia.html neutro/guia.html
+          if [ -d assets ]; then cp -R assets neutro/; fi
 
           python3 - <<'EOF'
           import re
+          from pathlib import Path
 
-          with open('neutro/index.html', 'r', encoding='utf-8') as f:
-              content = f.read()
+          for path in [Path('neutro/index.html'), Path('neutro/guia.html')]:
+              content = path.read_text(encoding='utf-8')
 
-          # Eliminar formulario y JS asociado
-          content = re.sub(
-              r'<!--\s*NEUTRO-REMOVE-START\s*-->.*?<!--\s*NEUTRO-REMOVE-END\s*-->',
-              '', content, flags=re.DOTALL
-          )
-          content = re.sub(
-              r'/\*\s*NEUTRO-REMOVE-START\s*\*/.*?/\*\s*NEUTRO-REMOVE-END\s*\*/',
-              '', content, flags=re.DOTALL
-          )
+              content = re.sub(
+                  r'<!--\s*NEUTRO-REMOVE-START\s*-->.*?<!--\s*NEUTRO-REMOVE-END\s*-->',
+                  '', content, flags=re.DOTALL
+              )
+              content = re.sub(
+                  r'/\*\s*NEUTRO-REMOVE-START\s*\*/.*?/\*\s*NEUTRO-REMOVE-END\s*\*/',
+                  '', content, flags=re.DOTALL
+              )
 
-          # Eliminar código de tienda SHVCB5
-          content = content.replace('https://ww1.lifeplus.com/SHVCB5/M/es/es/web-page/products?search=pets',
-                                    'https://ww1.lifeplus.com/es/es/web-page/products?search=pets')
-          content = re.sub(r'https://www\.lifeplus\.com/SHVCB5/S/', 'https://www.lifeplus.com/', content)
-          content = content.replace('ShopID SHVCB5', 'LifePlus International')
-          content = re.sub(r'<strong>SHVCB5</strong>', 'LifePlus International', content)
+              content = content.replace(
+                  'https://ww1.lifeplus.com/SHVCB5/M/es/es/web-page/products?search=pets',
+                  'https://ww1.lifeplus.com/es/es/web-page/products?search=pets'
+              )
+              content = re.sub(r'https://www\.lifeplus\.com/SHVCB5/S/', 'https://www.lifeplus.com/', content)
+              content = content.replace('ShopID SHVCB5', 'LifePlus International')
+              content = re.sub(r'<strong>SHVCB5</strong>', 'LifePlus International', content)
 
-          with open('neutro/index.html', 'w', encoding='utf-8') as f:
-              f.write(content)
+              path.write_text(content, encoding='utf-8')
 
-          print("Versión neutra generada OK")
+          print("Version neutra generada OK")
           EOF
 
       - name: Deploy vitallinkplus.com (versión neutra)

@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'guia.html'
+      - 'assets/**'
 
 jobs:
   sync:
@@ -17,39 +19,40 @@ jobs:
 
       - name: Generar index.html neutro
         run: |
-          cp source/index.html index-neutro.html
+          mkdir -p neutro-build
+          cp source/index.html neutro-build/index.html
+          cp source/guia.html neutro-build/guia.html
+          if [ -d source/assets ]; then cp -R source/assets neutro-build/; fi
 
-          # Reemplazar códigos de tienda SHVCB5
-          sed -i 's|https://ww1\.lifeplus\.com/SHVCB5/M/es/es/web-page/products?search=pets|https://ww1.lifeplus.com/es/es/web-page/products?search=pets|g' index-neutro.html
-          sed -i 's|https://www\.lifeplus\.com/SHVCB5/S/|https://www.lifeplus.com/|g' index-neutro.html
-          sed -i 's|ShopID SHVCB5|LifePlus International|g' index-neutro.html
-          sed -i 's|<strong>SHVCB5</strong>|LifePlus International|g' index-neutro.html
-
-          # Eliminar bloques marcados con NEUTRO-REMOVE (formulario y JS asociado)
           python3 - <<'EOF'
+from pathlib import Path
 import re
 
-with open('index-neutro.html', 'r', encoding='utf-8') as f:
-    content = f.read()
+for path in [Path('neutro-build/index.html'), Path('neutro-build/guia.html')]:
+    content = path.read_text(encoding='utf-8')
 
-# Eliminar bloques entre marcadores HTML <!-- NEUTRO-REMOVE-START --> ... <!-- NEUTRO-REMOVE-END -->
-content = re.sub(
-    r'<!--\s*NEUTRO-REMOVE-START\s*-->.*?<!--\s*NEUTRO-REMOVE-END\s*-->',
-    '',
-    content,
-    flags=re.DOTALL
-)
+    content = re.sub(
+        r'<!--\s*NEUTRO-REMOVE-START\s*-->.*?<!--\s*NEUTRO-REMOVE-END\s*-->',
+        '',
+        content,
+        flags=re.DOTALL
+    )
+    content = re.sub(
+        r'/\*\s*NEUTRO-REMOVE-START\s*\*/.*?/\*\s*NEUTRO-REMOVE-END\s*\*/',
+        '',
+        content,
+        flags=re.DOTALL
+    )
 
-# Eliminar bloques entre marcadores JS /* NEUTRO-REMOVE-START */ ... /* NEUTRO-REMOVE-END */
-content = re.sub(
-    r'/\*\s*NEUTRO-REMOVE-START\s*\*/.*?/\*\s*NEUTRO-REMOVE-END\s*\*/',
-    '',
-    content,
-    flags=re.DOTALL
-)
+    content = content.replace(
+        'https://ww1.lifeplus.com/SHVCB5/M/es/es/web-page/products?search=pets',
+        'https://ww1.lifeplus.com/es/es/web-page/products?search=pets'
+    )
+    content = re.sub(r'https://www\.lifeplus\.com/SHVCB5/S/', 'https://www.lifeplus.com/', content)
+    content = content.replace('ShopID SHVCB5', 'LifePlus International')
+    content = re.sub(r'<strong>SHVCB5</strong>', 'LifePlus International', content)
 
-with open('index-neutro.html', 'w', encoding='utf-8') as f:
-    f.write(content)
+    path.write_text(content, encoding='utf-8')
 
 print("Bloques NEUTRO-REMOVE eliminados correctamente")
 EOF
@@ -60,11 +63,16 @@ EOF
         run: |
           git clone https://x-access-token:${NEUTRO_TOKEN}@github.com/peterestelaweb/lifepluspetsneutro.git neutro
 
-          cp index-neutro.html neutro/index.html
+          cp neutro-build/index.html neutro/index.html
+          cp neutro-build/guia.html neutro/guia.html
+          if [ -d neutro-build/assets ]; then
+            rm -rf neutro/assets
+            cp -R neutro-build/assets neutro/assets
+          fi
 
           cd neutro
           git config user.name  "GitHub Actions"
           git config user.email "actions@github.com"
-          git add index.html
-          git diff --staged --quiet && echo "Sin cambios" || git commit -m "sync: actualización automática desde lifepluspetspain.com"
+          git add index.html guia.html assets
+          git diff --staged --quiet && echo "Sin cambios" || git commit -m "sync: actualizacion automatica desde lifepluspetspain.com"
           git push origin main
