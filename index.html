@@ -2577,12 +2577,25 @@
           <p class="vets-subtitle">
             Respaldada por ciencia, aceptada por los dueños. Únete a la red de veterinarios y profesionales del sector que ya confían en LifePlus Pets.
           </p>
+
+          <!-- NEUTRO-REMOVE-START -->
+          <div class="vets-video-wrap left" aria-label="Video LifePlus Pets">
+            <video
+              id="vetVideoLeft"
+              class="vets-video"
+              src="assets/video/IzzyLowerThird.mp4"
+              controls
+              playsinline
+              preload="metadata"
+            ></video>
+          </div>
+          <!-- NEUTRO-REMOVE-END -->
         </div>
 
         <div class="vets-right-video fade-in fade-in-delay-2">
           <div class="vets-video-wrap" aria-label="Video LifePlus Pets">
             <video
-              id="vetVideo"
+              id="vetVideoRight"
               class="vets-video"
               src="assets/video/IzzyLowerThird.mp4"
               controls
@@ -3092,29 +3105,34 @@
 
     // Keep this outside NEUTRO-REMOVE so it also works in la versión NEUTRA.
     (function () {
-      const video = document.getElementById('vetVideo');
-      if (!video) return;
-
       const key = 'lpp_vet_video_t';
 
-      video.addEventListener('loadedmetadata', () => {
-        const raw = localStorage.getItem(key);
-        if (!raw) return;
-        const t = Number(raw);
-        if (!Number.isFinite(t)) return;
-        if (t > 0 && t < Math.max(0, video.duration - 0.75)) {
-          video.currentTime = t;
-        }
-      });
+      function wire(id) {
+        const video = document.getElementById(id);
+        if (!video) return;
 
-      video.addEventListener('timeupdate', () => {
-        if (!Number.isFinite(video.currentTime)) return;
-        if (video.currentTime > 0.5) localStorage.setItem(key, String(video.currentTime));
-      });
+        video.addEventListener('loadedmetadata', () => {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          const t = Number(raw);
+          if (!Number.isFinite(t)) return;
+          if (t > 0 && t < Math.max(0, video.duration - 0.75)) {
+            video.currentTime = t;
+          }
+        });
 
-      video.addEventListener('ended', () => {
-        localStorage.removeItem(key);
-      });
+        video.addEventListener('timeupdate', () => {
+          if (!Number.isFinite(video.currentTime)) return;
+          if (video.currentTime > 0.5) localStorage.setItem(key, String(video.currentTime));
+        });
+
+        video.addEventListener('ended', () => {
+          localStorage.removeItem(key);
+        });
+      }
+
+      wire('vetVideoLeft');
+      wire('vetVideoRight');
     })();
 
     /* ==============================
