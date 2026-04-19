@@ -2584,6 +2584,9 @@
               id="vetVideoLeft"
               class="vets-video"
               src="assets/video/IzzyLowerThird.mp4"
+              autoplay
+              muted
+              loop
               controls
               playsinline
               preload="metadata"
@@ -2598,6 +2601,9 @@
               id="vetVideoRight"
               class="vets-video"
               src="assets/video/IzzyLowerThird.mp4"
+              autoplay
+              muted
+              loop
               controls
               playsinline
               preload="metadata"
@@ -3113,11 +3119,16 @@
 
         video.addEventListener('loadedmetadata', () => {
           const raw = localStorage.getItem(key);
-          if (!raw) return;
-          const t = Number(raw);
-          if (!Number.isFinite(t)) return;
-          if (t > 0 && t < Math.max(0, video.duration - 0.75)) {
-            video.currentTime = t;
+          if (raw) {
+            const t = Number(raw);
+            if (Number.isFinite(t) && t > 0 && t < Math.max(0, video.duration - 0.75)) {
+              video.currentTime = t;
+            }
+          }
+
+          // Autoplay can be flaky after seeking; request play explicitly (allowed because muted).
+          if (video.autoplay) {
+            Promise.resolve(video.play()).catch(() => {});
           }
         });
 
