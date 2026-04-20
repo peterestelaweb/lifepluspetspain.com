@@ -9,6 +9,7 @@ on:
       - 'guia.html'
       - 'CNAME'
       - 'assets/**'
+      - 'crm/**'
 
 jobs:
   deploy:
@@ -24,6 +25,7 @@ jobs:
           cp index.html public/index.html
           cp guia.html public/guia.html
           if [ -d assets ]; then cp -R assets public/; fi
+          if [ -d crm ]; then cp -R crm public/; fi
 
       - name: Deploy lifepluspetspain.com (versión completa)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -42,6 +44,7 @@ jobs:
           cp index.html neutro/index.html
           cp guia.html neutro/guia.html
           if [ -d assets ]; then cp -R assets neutro/; fi
+          if [ -d crm ]; then cp -R crm neutro/; fi
 
           python3 - <<'EOF'
           import re

@@ -1,4 +1,5 @@
 const STORAGE_KEY = "pets_crm_contacts_v2";
+const API_URL = "./api.php";
 
 const form = document.getElementById("contactForm");
 const tableBody = document.getElementById("contactsTableBody");
@@ -50,17 +51,22 @@ const priorityInput = document.getElementById("priority");
 const retentionReviewAtInput = document.getElementById("retentionReviewAt");
 const sourceInput = document.getElementById("source");
 
-let contacts = loadContacts();
+let contacts = loadContactsLocal();
 let selectedHistoryContactId = "";
 
-function loadContacts() {
+function normalizeContacts(items) {
+  const list = Array.isArray(items) ? items : [];
+  return list.map((item) => ({
+    ...item,
+    interactions: Array.isArray(item.interactions) ? item.interactions : [],
+  }));
+}
+
+function loadContactsLocal() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return parsed.map((item) => ({
-      ...item,
-      interactions: Array.isArray(item.interactions) ? item.interactions : [],
-    }));
+    return normalizeContacts(parsed);
   } catch {
     return [];
   }
@@ -68,6 +74,45 @@ function loadContacts() {
 
 function saveContacts() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
+  void saveContactsRemote();
+}
+
+async function loadContactsRemote() {
+  const response = await fetch(API_URL, { cache: "no-store" });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.json();
+  if (!data?.ok || !Array.isArray(data.contacts)) {
+    throw new Error("Respuesta invalida del servidor");
+  }
+  return normalizeContacts(data.contacts);
+}
+
+async function saveContactsRemote() {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contacts }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data?.ok) throw new Error(data?.error || "Error guardando en servidor");
+  } catch (error) {
+    // Keep local storage as fallback; avoid blocking UX.
+    console.warn("No se pudo guardar en servidor:", error);
+  }
+}
+
+async function hydrateFromServer() {
+  try {
+    const remoteContacts = await loadContactsRemote();
+    contacts = remoteContacts;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
+    renderTable();
+    renderHistoryPanel();
+  } catch (error) {
+    console.warn("No se pudo cargar del servidor, uso localStorage:", error);
+  }
 }
 
 function sanitize(value) {
@@ -775,3 +820,4 @@ clearForm();
 clearInteractionForm();
 renderTable();
 renderHistoryPanel();
+void hydrateFromServer();
