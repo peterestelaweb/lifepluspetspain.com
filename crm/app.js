@@ -6,6 +6,24 @@ const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
 const clearFormBtn = document.getElementById("clearFormBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
+const exportInteractionsBtn = document.getElementById("exportInteractionsBtn");
+const interactionForm = document.getElementById("interactionForm");
+const clearInteractionFormBtn = document.getElementById(
+  "clearInteractionFormBtn",
+);
+const historyContactMeta = document.getElementById("historyContactMeta");
+const interactionsTableBody = document.getElementById("interactionsTableBody");
+
+const interactionAtInput = document.getElementById("interactionAt");
+const interactionChannelInput = document.getElementById("interactionChannel");
+const interactionTypeInput = document.getElementById("interactionType");
+const interactionRespondedInput = document.getElementById("interactionResponded");
+const interactionSummaryInput = document.getElementById("interactionSummary");
+const interactionSaidInput = document.getElementById("interactionSaid");
+const interactionResultInput = document.getElementById("interactionResult");
+const interactionNextStepInput = document.getElementById("interactionNextStep");
+const interactionNextDueInput = document.getElementById("interactionNextDue");
+const interactionOwnerInput = document.getElementById("interactionOwner");
 
 const recordIdInput = document.getElementById("recordId");
 const contactTypeInput = document.getElementById("contactType");
@@ -31,11 +49,16 @@ const retentionReviewAtInput = document.getElementById("retentionReviewAt");
 const sourceInput = document.getElementById("source");
 
 let contacts = loadContacts();
+let selectedHistoryContactId = "";
 
 function loadContacts() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    return parsed.map((item) => ({
+      ...item,
+      interactions: Array.isArray(item.interactions) ? item.interactions : [],
+    }));
   } catch {
     return [];
   }
@@ -51,6 +74,12 @@ function sanitize(value) {
 
 function today() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function nowLocalDatetime() {
+  const now = new Date();
+  const shifted = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return shifted.toISOString().slice(0, 16);
 }
 
 function createPayload() {
@@ -78,6 +107,7 @@ function createPayload() {
     source: sanitize(sourceInput.value),
     created_at: today(),
     updated_at: today(),
+    interactions: [],
   };
 }
 
@@ -109,6 +139,9 @@ function upsertRecord() {
     const index = contacts.findIndex((item) => item.id === existingId);
     if (index >= 0) {
       payload.created_at = contacts[index].created_at || today();
+      payload.interactions = Array.isArray(contacts[index].interactions)
+        ? contacts[index].interactions
+        : [];
       contacts[index] = payload;
     }
   } else {
@@ -154,6 +187,7 @@ function editRecord(id) {
   priorityInput.value = item.priority || "medium";
   retentionReviewAtInput.value = item.retention_review_at || "";
   sourceInput.value = item.source || "";
+  openHistory(id);
 }
 
 function deleteRecord(id) {
@@ -249,7 +283,7 @@ function renderTable() {
   if (!rows.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9">No hay contactos con los filtros actuales.</td>
+        <td colspan="10">No hay contactos con los filtros actuales.</td>
       </tr>
     `;
     return;
@@ -277,8 +311,12 @@ function renderTable() {
         </td>
         <td>${escapeHtml(item.next_step || "-")}</td>
         <td>${escapeHtml(item.next_step_due || "-")}</td>
+        <td>${Array.isArray(item.interactions) ? item.interactions.length : 0}</td>
         <td>
           <div class="action-group">
+            <button class="mini" data-action="history" data-id="${item.id}">
+              Historial
+            </button>
             <button class="mini" data-action="edit" data-id="${item.id}">
               Editar
             </button>
@@ -348,6 +386,208 @@ function exportCsv() {
   URL.revokeObjectURL(url);
 }
 
+function clearInteractionForm() {
+  interactionForm.reset();
+  interactionAtInput.value = nowLocalDatetime();
+  interactionRespondedInput.value = "no";
+  interactionResultInput.value = "sin_respuesta";
+}
+
+function findContactById(id) {
+  return contacts.find((item) => item.id === id);
+}
+
+function openHistory(id) {
+  selectedHistoryContactId = id;
+  renderHistoryPanel();
+}
+
+function renderHistoryPanel() {
+  const contact = findContactById(selectedHistoryContactId);
+  if (!contact) {
+    historyContactMeta.textContent =
+      'Selecciona "Historial" en un contacto para registrar SMS, WhatsApp, llamadas y respuestas.';
+    interactionsTableBody.innerHTML = `
+      <tr><td colspan="10">Sin contacto seleccionado.</td></tr>
+    `;
+    return;
+  }
+
+  historyContactMeta.textContent = `${contact.organization_name} · ${contact.contact_name || "Sin persona de contacto"} · ${contact.phone || "-"}`;
+  interactionOwnerInput.value = contact.owner || "";
+
+  const interactions = Array.isArray(contact.interactions)
+    ? [...contact.interactions].sort((a, b) =>
+        String(b.at || "").localeCompare(String(a.at || "")),
+      )
+    : [];
+
+  if (!interactions.length) {
+    interactionsTableBody.innerHTML = `
+      <tr><td colspan="10">Sin interacciones registradas para este contacto.</td></tr>
+    `;
+    return;
+  }
+
+  interactionsTableBody.innerHTML = interactions
+    .map(
+      (item) => `
+      <tr>
+        <td>${escapeHtml(item.at || "-")}</td>
+        <td>${escapeHtml(item.channel || "-")}</td>
+        <td>${escapeHtml(item.type || "-")}</td>
+        <td>${escapeHtml(item.responded || "-")}</td>
+        <td>${escapeHtml(item.summary || "-")}</td>
+        <td>${escapeHtml(item.said || "-")}</td>
+        <td>${responseLabel(item.result || "sin_respuesta")}</td>
+        <td>${escapeHtml(item.next_step || "-")}<br /><small>${escapeHtml(item.next_due || "")}</small></td>
+        <td>${escapeHtml(item.owner || "-")}</td>
+        <td>
+          <button class="mini" data-action="delete-interaction" data-id="${contact.id}" data-interaction-id="${item.id}">
+            Borrar
+          </button>
+        </td>
+      </tr>
+    `,
+    )
+    .join("");
+}
+
+function addInteraction() {
+  const contact = findContactById(selectedHistoryContactId);
+  if (!contact) {
+    alert("Primero selecciona un contacto en el boton Historial.");
+    return;
+  }
+
+  const summary = sanitize(interactionSummaryInput.value);
+  if (!summary) {
+    alert("Describe la accion realizada.");
+    return;
+  }
+
+  const at = interactionAtInput.value || nowLocalDatetime();
+  const said = sanitize(interactionSaidInput.value);
+  const nextStep = sanitize(interactionNextStepInput.value);
+  const nextDue = interactionNextDueInput.value || "";
+  const owner = sanitize(interactionOwnerInput.value);
+  const result = interactionResultInput.value || "sin_respuesta";
+
+  const interaction = {
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    at,
+    channel: interactionChannelInput.value,
+    type: interactionTypeInput.value,
+    responded: interactionRespondedInput.value,
+    summary,
+    said,
+    result,
+    next_step: nextStep,
+    next_due: nextDue,
+    owner,
+  };
+
+  if (!Array.isArray(contact.interactions)) contact.interactions = [];
+  contact.interactions.push(interaction);
+
+  // Keep current contact status synchronized with the latest activity.
+  contact.last_contact_date = at.slice(0, 10);
+  contact.response_status = result;
+  if (said) contact.response_notes = said;
+  if (nextStep) contact.next_step = nextStep;
+  if (nextDue) contact.next_step_due = nextDue;
+  if (owner) contact.owner = owner;
+  contact.updated_at = today();
+
+  saveContacts();
+  clearInteractionForm();
+  renderTable();
+  renderHistoryPanel();
+}
+
+function deleteInteraction(contactId, interactionId) {
+  const contact = findContactById(contactId);
+  if (!contact || !Array.isArray(contact.interactions)) return;
+  contact.interactions = contact.interactions.filter(
+    (item) => item.id !== interactionId,
+  );
+  contact.updated_at = today();
+  saveContacts();
+  renderTable();
+  renderHistoryPanel();
+}
+
+function toCsvInteractions(records) {
+  const columns = [
+    "contact_id",
+    "organization_name",
+    "contact_name",
+    "phone",
+    "owner",
+    "interaction_id",
+    "at",
+    "channel",
+    "type",
+    "responded",
+    "summary",
+    "said",
+    "result",
+    "next_step",
+    "next_due",
+    "interaction_owner",
+  ];
+
+  const lines = [columns.join(",")];
+  for (const record of records) {
+    const interactions = Array.isArray(record.interactions)
+      ? record.interactions
+      : [];
+    for (const interaction of interactions) {
+      const row = {
+        contact_id: record.id || "",
+        organization_name: record.organization_name || "",
+        contact_name: record.contact_name || "",
+        phone: record.phone || "",
+        owner: record.owner || "",
+        interaction_id: interaction.id || "",
+        at: interaction.at || "",
+        channel: interaction.channel || "",
+        type: interaction.type || "",
+        responded: interaction.responded || "",
+        summary: interaction.summary || "",
+        said: interaction.said || "",
+        result: interaction.result || "",
+        next_step: interaction.next_step || "",
+        next_due: interaction.next_due || "",
+        interaction_owner: interaction.owner || "",
+      };
+      lines.push(
+        columns
+          .map((column) => {
+            const value = String(row[column] || "");
+            const escaped = value.replaceAll('"', '""');
+            return `"${escaped}"`;
+          })
+          .join(","),
+      );
+    }
+  }
+  return lines.join("\n");
+}
+
+function exportInteractionsCsv() {
+  const csv = toCsvInteractions(contacts);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `pets-crm-interacciones-${today()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   upsertRecord();
@@ -355,8 +595,14 @@ form.addEventListener("submit", (event) => {
 
 clearFormBtn.addEventListener("click", clearForm);
 exportCsvBtn.addEventListener("click", exportCsv);
+exportInteractionsBtn.addEventListener("click", exportInteractionsCsv);
 searchInput.addEventListener("input", renderTable);
 statusFilter.addEventListener("change", renderTable);
+interactionForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  addInteraction();
+});
+clearInteractionFormBtn.addEventListener("click", clearInteractionForm);
 
 tableBody.addEventListener("click", (event) => {
   const target = event.target;
@@ -366,9 +612,17 @@ tableBody.addEventListener("click", (event) => {
   const id = target.dataset.id;
   if (!action || !id) return;
 
+  if (action === "history") openHistory(id);
   if (action === "edit") editRecord(id);
   if (action === "delete") deleteRecord(id);
+  if (action === "delete-interaction") {
+    const interactionId = target.dataset.interactionId;
+    if (!interactionId) return;
+    deleteInteraction(id, interactionId);
+  }
 });
 
 clearForm();
+clearInteractionForm();
 renderTable();
+renderHistoryPanel();

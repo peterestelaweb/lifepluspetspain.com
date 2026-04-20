@@ -242,3 +242,31 @@ th {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
+
+.history-panel {
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.history-panel h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.history-meta {
+  margin: 0 0 0.75rem;
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+}
+
+.history-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-list-wrap {
+  margin-top: 0.8rem;
+  overflow-x: auto;
+}
