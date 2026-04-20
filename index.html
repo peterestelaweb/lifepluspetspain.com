@@ -3187,6 +3187,43 @@
         el.classList.add('visible');
       });
     }, 800);
+
+    /* ==============================
+       HIDDEN CRM ACCESS (2s hold on logo)
+    ============================== */
+    (function () {
+      const logo = document.querySelector('.nav-logo');
+      if (!logo) return;
+
+      const HOLD_MS = 2000;
+      let timer = null;
+      let triggered = false;
+
+      function startHold() {
+        triggered = false;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          triggered = true;
+          window.location.href = 'crm/';
+        }, HOLD_MS);
+      }
+
+      function endHold() {
+        clearTimeout(timer);
+      }
+
+      logo.addEventListener('pointerdown', startHold);
+      logo.addEventListener('pointerup', endHold);
+      logo.addEventListener('pointerleave', endHold);
+      logo.addEventListener('pointercancel', endHold);
+
+      logo.addEventListener('click', (event) => {
+        if (triggered) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      });
+    })();
   </script>
 </body>
 </html>
