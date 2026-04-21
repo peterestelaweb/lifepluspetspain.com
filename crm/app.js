@@ -5,6 +5,7 @@ const form = document.getElementById("contactForm");
 const tableBody = document.getElementById("contactsTableBody");
 const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
+const smsTemplateInput = document.getElementById("smsTemplateInput");
 const clearFormBtn = document.getElementById("clearFormBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 const exportInteractionsBtn = document.getElementById("exportInteractionsBtn");
@@ -362,6 +363,9 @@ function renderTable() {
         <td>${Array.isArray(item.interactions) ? item.interactions.length : 0}</td>
         <td>
           <div class="action-group">
+            <button class="mini" data-action="sms" data-id="${item.id}">
+              SMS
+            </button>
             <button class="mini" data-action="history" data-id="${item.id}">
               Historial
             </button>
@@ -377,6 +381,65 @@ function renderTable() {
     `,
     )
     .join("");
+}
+
+function getSmsTemplate() {
+  return sanitize(smsTemplateInput?.value) || "Hola {nombre}, soy Maika de LifePlus Pets.";
+}
+
+function buildSmsMessage(contact) {
+  const template = getSmsTemplate();
+  const name = sanitize(contact.contact_name) || sanitize(contact.organization_name) || "hola";
+  const org = sanitize(contact.organization_name) || "";
+  const owner = sanitize(contact.owner) || "";
+  return template
+    .replaceAll("{nombre}", name)
+    .replaceAll("{organizacion}", org)
+    .replaceAll("{upline}", owner);
+}
+
+function appendInteraction(contact, interaction) {
+  if (!Array.isArray(contact.interactions)) contact.interactions = [];
+  contact.interactions.push(interaction);
+  contact.last_contact_date = interaction.at.slice(0, 10);
+  contact.response_status = interaction.result || "sin_respuesta";
+  if (interaction.next_step) contact.next_step = interaction.next_step;
+  if (interaction.next_due) contact.next_step_due = interaction.next_due;
+  contact.updated_at = today();
+}
+
+function sendSmsForContact(id) {
+  const contact = findContactById(id);
+  if (!contact) return;
+
+  const normalizedPhone = normalizePhone(contact.phone);
+  if (!normalizedPhone) {
+    alert("Este contacto no tiene telefono valido para SMS.");
+    return;
+  }
+
+  const message = buildSmsMessage(contact);
+  const smsUrl = `sms:${encodeURIComponent(normalizedPhone)}?body=${encodeURIComponent(message)}`;
+  window.location.href = smsUrl;
+
+  const interaction = {
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    at: nowLocalDatetime(),
+    channel: "sms",
+    type: "outbound",
+    responded: "pendiente",
+    summary: "SMS abierto desde CRM (Mac Mensajes)",
+    said: message,
+    result: "sin_respuesta",
+    next_step: "Esperar respuesta por SMS",
+    next_due: today(),
+    owner: sanitize(contact.owner),
+  };
+
+  appendInteraction(contact, interaction);
+  saveContacts();
+  renderTable();
+  if (selectedHistoryContactId === id) renderHistoryPanel();
 }
 
 function toCsv(records) {
@@ -807,13 +870,20 @@ tableBody.addEventListener("click", (event) => {
   if (!action || !id) return;
 
   if (action === "history") openHistory(id);
+  if (action === "sms") sendSmsForContact(id);
   if (action === "edit") editRecord(id);
   if (action === "delete") deleteRecord(id);
-  if (action === "delete-interaction") {
-    const interactionId = target.dataset.interactionId;
-    if (!interactionId) return;
-    deleteInteraction(id, interactionId);
-  }
+});
+
+interactionsTableBody.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const action = target.dataset.action;
+  if (action !== "delete-interaction") return;
+  const id = target.dataset.id;
+  const interactionId = target.dataset.interactionId;
+  if (!id || !interactionId) return;
+  deleteInteraction(id, interactionId);
 });
 
 clearForm();
