@@ -386,7 +386,7 @@ function renderTable() {
 function getSmsTemplate() {
   return (
     sanitize(smsTemplateInput?.value) ||
-    "Hola {nombre_corto}, Peter y Maika de LifePlus por aqui. Hemos visto tu ficha y creemos que puede interesarte una nueva opcion para perros como complemento a LifePlus. Te paso info breve?"
+    "Hola {nombre_corto}, Peter y Maika de LifePlus por aquí. Hemos visto tu ficha y creemos que puede interesarte una nueva opción para perros como complemento a LifePlus. ¿Te paso info breve?"
   );
 }
 
