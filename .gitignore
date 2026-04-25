@@ -18,3 +18,8 @@ output/
 
 # CRM live database — never commit, never deploy
 crm/data/
+
+# Local working copies and session notes
+neutro-local/
+WRAPUP-*.md
+PETS MARKETING MATERIAL/
