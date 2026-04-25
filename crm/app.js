@@ -8,6 +8,7 @@ const tableBody = document.getElementById("contactsTableBody");
 const searchInput = document.getElementById("searchInput");
 const statusFilter = document.getElementById("statusFilter");
 const smsTemplateInput = document.getElementById("smsTemplateInput");
+const ownerFilter = document.getElementById("ownerFilter");
 const clearFormBtn = document.getElementById("clearFormBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 const exportInteractionsBtn = document.getElementById("exportInteractionsBtn");
@@ -340,10 +341,12 @@ function textMatch(item, query) {
 function getFilteredContacts() {
   const query = sanitize(searchInput.value);
   const stage = statusFilter.value;
+  const owner = ownerFilter.value;
 
   return contacts
     .filter((item) => textMatch(item, query))
     .filter((item) => (stage ? item.pipeline_stage === stage : true))
+    .filter((item) => (owner ? item.owner === owner : true))
     .sort((a, b) => {
       const aDue = a.next_step_due || "9999-12-31";
       const bDue = b.next_step_due || "9999-12-31";
@@ -1094,6 +1097,7 @@ importBelenBtn.addEventListener("click", () =>
 );
 searchInput.addEventListener("input", renderTable);
 statusFilter.addEventListener("change", renderTable);
+ownerFilter.addEventListener("change", renderTable);
 interactionForm.addEventListener("submit", (event) => {
   event.preventDefault();
   addInteraction();
