@@ -1,5 +1,7 @@
 const STORAGE_KEY = "pets_crm_contacts_v2";
+const SMS_TEMPLATE_KEY = "pets_crm_sms_template";
 const API_URL = "./api.php";
+const DEFAULT_SMS_TEMPLATE = "Hola {nombre_corto}, somos Peter y Maika de LifePlus. Te escribimos porque ha salido una novedad de bienestar para perros que encaja con clientes de LifePlus. Si quieres, te enviamos un resumen corto por aquí y tú decides sin compromiso.";
 
 const form = document.getElementById("contactForm");
 const tableBody = document.getElementById("contactsTableBody");
@@ -384,10 +386,7 @@ function renderTable() {
 }
 
 function getSmsTemplate() {
-  return (
-    sanitize(smsTemplateInput?.value) ||
-    "Hola {nombre_corto}, Peter y Maika de LifePlus por aquí. Hemos visto tu ficha y creemos que puede interesarte una nueva opción para perros como complemento a LifePlus. ¿Te paso info breve?"
-  );
+  return sanitize(smsTemplateInput?.value) || DEFAULT_SMS_TEMPLATE;
 }
 
 function formatShortName(raw) {
@@ -442,8 +441,12 @@ function sendSmsForContact(id) {
   }
 
   const message = buildSmsMessage(contact);
-  const smsUrl = `sms:${encodeURIComponent(normalizedPhone)}?body=${encodeURIComponent(message)}`;
-  window.location.href = smsUrl;
+  const smsUrl = `sms:${normalizedPhone}?body=${encodeURIComponent(message)}`;
+  const smsLink = document.createElement("a");
+  smsLink.href = smsUrl;
+  document.body.appendChild(smsLink);
+  smsLink.click();
+  smsLink.remove();
 
   const interaction = {
     id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -907,6 +910,11 @@ interactionsTableBody.addEventListener("click", (event) => {
   const interactionId = target.dataset.interactionId;
   if (!id || !interactionId) return;
   deleteInteraction(id, interactionId);
+});
+
+smsTemplateInput.value = localStorage.getItem(SMS_TEMPLATE_KEY) || DEFAULT_SMS_TEMPLATE;
+smsTemplateInput.addEventListener("input", () => {
+  localStorage.setItem(SMS_TEMPLATE_KEY, smsTemplateInput.value);
 });
 
 clearForm();
