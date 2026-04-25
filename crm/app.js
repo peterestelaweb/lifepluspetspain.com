@@ -14,6 +14,7 @@ const exportCsvBtn = document.getElementById("exportCsvBtn");
 const exportInteractionsBtn = document.getElementById("exportInteractionsBtn");
 const importMonicaBtn = document.getElementById("importMonicaBtn");
 const importBelenBtn = document.getElementById("importBelenBtn");
+const importBelenPdfBtn = document.getElementById("importBelenPdfBtn");
 const interactionForm = document.getElementById("interactionForm");
 const clearInteractionFormBtn = document.getElementById(
   "clearInteractionFormBtn",
@@ -998,7 +999,12 @@ async function importNormalizedFile(url, upline) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`No se pudo cargar ${url}`);
     const buffer = await response.arrayBuffer();
-    const text = new TextDecoder("windows-1252").decode(buffer);
+    let text;
+    try {
+      text = new TextDecoder("utf-8", { fatal: true }).decode(buffer);
+    } catch {
+      text = new TextDecoder("windows-1252").decode(buffer);
+    }
     const rows = parseCsvText(text);
     if (!rows.length) {
       alert("El archivo no contiene filas importables.");
@@ -1107,6 +1113,9 @@ importMonicaBtn.addEventListener("click", () =>
 );
 importBelenBtn.addEventListener("click", () =>
   importNormalizedFile("./import/belen-normalized.csv", "Belen"),
+);
+importBelenPdfBtn.addEventListener("click", () =>
+  importNormalizedFile("./import/belen-pdf-normalized.csv", "Belen"),
 );
 searchInput.addEventListener("input", renderTable);
 statusFilter.addEventListener("change", renderTable);
