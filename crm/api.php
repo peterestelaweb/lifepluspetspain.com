@@ -1,11 +1,20 @@
 <?php
 declare(strict_types=1);
 
+define('CRM_API_TOKEN', 'pets2026_Xk7mQ9pZrT');
+
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
+    exit;
+}
+
+$requestToken = $_SERVER['HTTP_X_CRM_TOKEN'] ?? '';
+if ($requestToken !== CRM_API_TOKEN) {
+    http_response_code(403);
+    echo json_encode(['ok' => false, 'error' => 'Forbidden']);
     exit;
 }
 

@@ -1,6 +1,7 @@
 const STORAGE_KEY = "pets_crm_contacts_v2";
 const SMS_TEMPLATE_KEY = "pets_crm_sms_template_v2";
 const API_URL = "./api.php";
+const API_TOKEN = "pets2026_Xk7mQ9pZrT";
 const DEFAULT_SMS_TEMPLATE = "Hola {nombre_corto}, somos Peter y Maika de LifePlus. Hemos visto tu ficha, creemos que nuestra nueva linea Pets te puede interesar. Te paso info?";
 
 const form = document.getElementById("contactForm");
@@ -84,7 +85,10 @@ function saveContacts() {
 }
 
 async function loadContactsRemote() {
-  const response = await fetch(API_URL, { cache: "no-store" });
+  const response = await fetch(API_URL, {
+    cache: "no-store",
+    headers: { "X-CRM-Token": API_TOKEN },
+  });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();
   if (!data?.ok || !Array.isArray(data.contacts)) {
@@ -97,7 +101,7 @@ async function saveContactsRemote() {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-CRM-Token": API_TOKEN },
       body: JSON.stringify({ contacts }),
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
