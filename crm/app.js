@@ -481,6 +481,7 @@ function renderTable() {
           <td>
             <div class="action-group">
               ${smsBtn}
+              <button class="mini wa-btn" data-action="whatsapp" data-id="${item.id}">WA</button>
               <button class="mini" data-action="history" data-id="${item.id}">Historial</button>
               <button class="mini" data-action="edit" data-id="${item.id}">Editar</button>
               <button class="mini" data-action="delete" data-id="${item.id}">Borrar</button>
@@ -569,6 +570,43 @@ function sendSmsForContact(id) {
     said: message,
     result: "sin_respuesta",
     next_step: "Esperar respuesta por SMS",
+    next_due: today(),
+    owner: sanitize(contact.owner),
+  };
+
+  appendInteraction(contact, interaction);
+  saveContacts();
+  renderTable();
+  if (selectedHistoryContactId === id) renderHistoryPanel();
+
+  pendingSmsContactId = id;
+}
+
+function sendWhatsAppForContact(id) {
+  const contact = findContactById(id);
+  if (!contact) return;
+
+  const normalizedPhone = normalizePhone(contact.phone);
+  if (!normalizedPhone) {
+    alert("Este contacto no tiene telefono valido para WhatsApp.");
+    return;
+  }
+
+  const waPhone = normalizedPhone.replace(/^\+/, "");
+  const message = buildSmsMessage(contact);
+  const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
+  window.open(waUrl, "_blank");
+
+  const interaction = {
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    at: nowLocalDatetime(),
+    channel: "whatsapp",
+    type: "outbound",
+    responded: "pendiente",
+    summary: "WhatsApp abierto desde CRM",
+    said: message,
+    result: "sin_respuesta",
+    next_step: "Esperar respuesta por WhatsApp",
     next_due: today(),
     owner: sanitize(contact.owner),
   };
@@ -1072,6 +1110,7 @@ tableBody.addEventListener("click", (event) => {
 
   if (action === "history") openHistory(id);
   if (action === "sms") sendSmsForContact(id);
+  if (action === "whatsapp") sendWhatsAppForContact(id);
   if (action === "edit") editRecord(id);
   if (action === "delete") deleteRecord(id);
 });

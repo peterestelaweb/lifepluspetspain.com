@@ -253,6 +253,7 @@ th {
 .mini.sms-1 { border-color: #059669; color: #059669; }
 .mini.sms-2 { border-color: #d97706; color: #d97706; }
 .mini.sms-3 { border-color: #dc2626; color: #dc2626; }
+.mini.wa-btn { border-color: #25d366; color: #25d366; font-weight: 600; }
 
 .history-panel {
   margin-top: 1rem;
