@@ -165,12 +165,17 @@ textarea {
 
 .table-wrap {
   overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  max-height: 68vh;
+  overflow-y: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 920px;
+  min-width: 1180px;
+  table-layout: fixed;
 }
 
 th,
@@ -183,10 +188,66 @@ td {
 }
 
 th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #fff;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 0.72rem;
   color: var(--ink-soft);
+}
+
+.col-actions,
+.cell-actions {
+  left: 0;
+  width: 168px;
+  min-width: 168px;
+}
+
+th.col-actions,
+td.cell-actions {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: #fff;
+  box-shadow: 1px 0 0 var(--line);
+}
+
+td.cell-actions {
+  z-index: 2;
+}
+
+.cell-name { width: 170px; }
+.cell-phone { width: 92px; }
+.col-email,
+.cell-email { width: 150px; }
+.cell-method { width: 84px; }
+.cell-pipeline { width: 78px; }
+.col-response,
+.cell-response { width: 250px; }
+.cell-next { width: 126px; }
+.cell-date { width: 76px; }
+.cell-count { width: 54px; text-align: center; }
+.cell-owner { width: 96px; }
+.cell-type { width: 92px; }
+
+.cell-email,
+.cell-response small,
+.cell-next {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell-email {
+  white-space: nowrap;
+}
+
+.cell-response small {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.35;
 }
 
 .status-pill {
@@ -237,16 +298,31 @@ th {
 }
 
 .action-group {
-  display: flex;
-  gap: 0.35rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.28rem;
 }
 
 .mini {
   border-radius: 7px;
   border: 1px solid var(--line);
   background: #fff;
-  padding: 0.25rem 0.5rem;
+  padding: 0.24rem 0.38rem;
   cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.mini.history-btn {
+  grid-column: 1 / -1;
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.mini.danger-btn {
+  color: #991b1b;
 }
 
 .mini.sms-sent {
@@ -328,7 +404,8 @@ tr.overdue td {
   background: #fff5f5;
 }
 
-tr.overdue td:nth-child(9) {
+tr.overdue .cell-next,
+tr.overdue .cell-date {
   color: #dc2626;
   font-weight: 600;
 }

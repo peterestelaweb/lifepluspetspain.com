@@ -479,36 +479,36 @@ function renderTable() {
         const isOverdue = item.next_step_due && item.next_step_due < today();
         return `
         <tr class="${isOverdue ? "overdue" : ""}">
-          <td>
+          <td class="cell-actions">
+            <div class="action-group">
+              <button class="mini history-btn" data-action="history" data-id="${item.id}">Historial</button>
+              ${smsBtn}
+              <button class="mini wa-btn" data-action="whatsapp" data-id="${item.id}">WA</button>
+              <button class="mini" data-action="edit" data-id="${item.id}">Editar</button>
+              <button class="mini danger-btn" data-action="delete" data-id="${item.id}">Borrar</button>
+            </div>
+          </td>
+          <td class="cell-name">
             <strong>${escapeHtml(item.organization_name)}</strong><br />
             <small>${escapeHtml(item.contact_name || "-")}</small>
           </td>
-          <td>${typeLabel(item.contact_type)}</td>
-          <td>${escapeHtml(item.phone || "-")}</td>
-          <td>${escapeHtml(item.email || "-")}</td>
-          <td>${escapeHtml(item.preferred_contact_method || "-")}</td>
-          <td>${escapeHtml(item.owner || "-")}</td>
+          <td class="cell-phone">${escapeHtml(item.phone || "-")}</td>
+          <td class="cell-email" title="${escapeHtml(item.email || "")}">${escapeHtml(item.email || "-")}</td>
+          <td class="cell-method">${escapeHtml(item.preferred_contact_method || "-")}</td>
           <td>
             <span class="status-pill ${statusClass(item.pipeline_stage)}">
               ${stageLabel(item.pipeline_stage)}
             </span>
           </td>
-          <td>
+          <td class="cell-response">
             ${responseLabel(item.response_status)}<br />
             <small>${escapeHtml(item.response_notes || "")}</small>
           </td>
-          <td>${escapeHtml(item.next_step || "-")}</td>
-          <td>${escapeHtml(item.next_step_due || "-")}</td>
-          <td>${Array.isArray(item.interactions) ? item.interactions.length : 0}</td>
-          <td>
-            <div class="action-group">
-              ${smsBtn}
-              <button class="mini wa-btn" data-action="whatsapp" data-id="${item.id}">WA</button>
-              <button class="mini" data-action="history" data-id="${item.id}">Historial</button>
-              <button class="mini" data-action="edit" data-id="${item.id}">Editar</button>
-              <button class="mini" data-action="delete" data-id="${item.id}">Borrar</button>
-            </div>
-          </td>
+          <td class="cell-next">${escapeHtml(item.next_step || "-")}</td>
+          <td class="cell-date">${escapeHtml(item.next_step_due || "-")}</td>
+          <td class="cell-count">${Array.isArray(item.interactions) ? item.interactions.length : 0}</td>
+          <td class="cell-owner">${escapeHtml(item.owner || "-")}</td>
+          <td class="cell-type">${typeLabel(item.contact_type)}</td>
         </tr>
       `;
       }
