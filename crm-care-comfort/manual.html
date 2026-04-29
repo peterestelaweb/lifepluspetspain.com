@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manual CRM — PETS Outreach</title>
+      <title>Manual CRM — Care & Comfort</title>
     <script
       src="../access-gate.js"
       data-code="1994"
-      data-key="crm"
+      data-key="crm-care-comfort"
       data-title="Acceso CRM"
       data-subtitle="Introduce el codigo 1994 para acceder al manual del CRM."
     ></script>
@@ -40,12 +40,12 @@
       <a class="back-btn" href="./index.html">← Volver al CRM</a>
 
       <p class="eyebrow">LifePlus Pets</p>
-      <h1>Manual de uso — PETS Outreach CRM</h1>
-      <p>Guía práctica para gestionar contactos, enviar SMS y hacer seguimiento de respuestas.</p>
+      <h1>Manual de uso — Care & Comfort CRM</h1>
+      <p>Guía práctica para gestionar clínicas, tiendas y puntos de venta con foco en Care &amp; Comfort.</p>
 
       <!-- ═══════════════════════════════════════ -->
       <h2>1. ¿Qué es este CRM?</h2>
-      <p>Es una herramienta para llevar el control de los contactos del sector veterinario y canino a los que presentamos la línea PETS de LifePlus. Permite enviar SMS personalizados, registrar respuestas y saber en qué fase está cada contacto.</p>
+      <p>Es una herramienta para llevar el control de clínicas veterinarias, tiendas de alimentación y comercios pet-friendly a los que presentamos Care &amp; Comfort. Permite enviar SMS personalizados, registrar respuestas y saber en qué fase está cada contacto.</p>
 
       <!-- ═══════════════════════════════════════ -->
       <h2>2. Las etapas del pipeline</h2>
@@ -107,10 +107,10 @@
       <div class="warning">Si alguien responde pero <strong>no lo anotas</strong>, el sistema avanzará el pipeline automáticamente a los 2 días como si no hubiera contestado. Anota siempre las respuestas.</div>
 
       <!-- ═══════════════════════════════════════ -->
-      <h2>5. Importar contactos (Mónica / Belén)</h2>
-      <div class="step"><div class="step-num">1</div><div>Prepara el CSV con columnas: <code>name, pin, address, last_month, source, tel</code></div></div>
-      <div class="step"><div class="step-num">2</div><div>Sube el archivo al servidor como <code>crm/import/monica-normalized.csv</code> o <code>belen-normalized.csv</code></div></div>
-      <div class="step"><div class="step-num">3</div><div>Pulsa <strong>Importar Monica</strong> o <strong>Importar Belen</strong> en la cabecera. Los contactos existentes (mismo teléfono o nombre) no se duplican.</div></div>
+      <h2>5. Importar contactos (Care & Comfort)</h2>
+      <div class="step"><div class="step-num">1</div><div>Prepara el CSV normalizado con columnas como <code>name, tel, address, source, contact_type</code>.</div></div>
+      <div class="step"><div class="step-num">2</div><div>Sube el archivo al servidor como <code>crm/import/barcelona-veterinarios-50km-normalized.csv</code> o <code>barcelona-tiendas-pet-50km-normalized.csv</code></div></div>
+      <div class="step"><div class="step-num">3</div><div>Pulsa <strong>Importar Vets BCN</strong> o <strong>Importar Tiendas BCN</strong> en la cabecera. Los contactos existentes (mismo teléfono o nombre) no se duplican.</div></div>
 
       <!-- ═══════════════════════════════════════ -->
       <h2>6. Exportar datos</h2>
@@ -137,7 +137,7 @@
       <h3>¿Qué pasa después de 3 intentos sin respuesta?</h3>
       <p>El contacto pasa automáticamente a etapa <strong>En nurture</strong>. Ahí ya no recibe auto-avances. Puedes recontactarlos en el futuro de forma puntual.</p>
 
-      <p style="margin-top:3rem;font-size:0.8rem;color:var(--ink-soft);">Manual generado el 25/04/2026 — LifePlus Pets CRM v2</p>
+      <p style="margin-top:3rem;font-size:0.8rem;color:var(--ink-soft);">Manual generado el 28/04/2026 — Care & Comfort CRM v1</p>
     </div>
   </body>
 </html>

@@ -1,8 +1,8 @@
-const STORAGE_KEY = "pets_crm_contacts_v2";
-const SMS_TEMPLATE_KEY = "pets_crm_sms_template_v2";
+const STORAGE_KEY = "care_comfort_crm_contacts_v1";
+const SMS_TEMPLATE_KEY = "care_comfort_crm_sms_template_v1";
 const API_URL = "./api.php";
 const API_TOKEN = "pets2026_Xk7mQ9pZrT";
-const DEFAULT_SMS_TEMPLATE = "Hola {nombre_corto}, somos Peter y Maika de LifePlus. Hemos visto tu ficha, creemos que nuestra nueva linea Pets te puede interesar. Te paso info?";
+const DEFAULT_SMS_TEMPLATE = "Hola {nombre_corto}, somos Peter y Maika de LifePlus Pets. Hemos visto tu ficha y creemos que Care & Comfort puede encajar en vuestro centro. Te paso info?";
 
 const form = document.getElementById("contactForm");
 const tableBody = document.getElementById("contactsTableBody");
@@ -13,9 +13,6 @@ const ownerFilter = document.getElementById("ownerFilter");
 const clearFormBtn = document.getElementById("clearFormBtn");
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 const exportInteractionsBtn = document.getElementById("exportInteractionsBtn");
-const importMonicaBtn = document.getElementById("importMonicaBtn");
-const importBelenBtn = document.getElementById("importBelenBtn");
-const importBelenPdfBtn = document.getElementById("importBelenPdfBtn");
 const importBarcelonaVetsBtn = document.getElementById("importBarcelonaVetsBtn");
 const importBarcelonaStoresBtn = document.getElementById(
   "importBarcelonaStoresBtn",
@@ -460,7 +457,7 @@ function renderTable() {
   if (!rows.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="11">No hay contactos con los filtros actuales.</td>
+        <td colspan="12">No hay contactos con los filtros actuales.</td>
       </tr>
     `;
     window.scrollTo(0, scrollY);
@@ -488,6 +485,7 @@ function renderTable() {
           </td>
           <td>${typeLabel(item.contact_type)}</td>
           <td>${escapeHtml(item.phone || "-")}</td>
+          <td>${escapeHtml(item.email || "-")}</td>
           <td>${escapeHtml(item.preferred_contact_method || "-")}</td>
           <td>${escapeHtml(item.owner || "-")}</td>
           <td>
@@ -1132,25 +1130,16 @@ form.addEventListener("submit", (event) => {
 clearFormBtn.addEventListener("click", clearForm);
 exportCsvBtn.addEventListener("click", exportCsv);
 exportInteractionsBtn.addEventListener("click", exportInteractionsCsv);
-importMonicaBtn.addEventListener("click", () =>
-  importNormalizedFile("./import/monica-normalized.csv", "Monica"),
-);
-importBelenBtn.addEventListener("click", () =>
-  importNormalizedFile("./import/belen-normalized.csv", "Belen"),
-);
-importBelenPdfBtn.addEventListener("click", () =>
-  importNormalizedFile("./import/belen-pdf-normalized.csv", "Belen"),
-);
 importBarcelonaVetsBtn.addEventListener("click", () =>
   importNormalizedFile(
     "./import/barcelona-veterinarios-50km-normalized.csv",
-    "Barcelona",
+    "Care & Comfort",
   ),
 );
 importBarcelonaStoresBtn.addEventListener("click", () =>
   importNormalizedFile(
     "./import/barcelona-tiendas-pet-50km-normalized.csv",
-    "Barcelona",
+    "Care & Comfort",
   ),
 );
 searchInput.addEventListener("input", renderTable);

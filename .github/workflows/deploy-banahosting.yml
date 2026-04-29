@@ -2,6 +2,15 @@ name: Deploy → Banahosting
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy_runtime_data:
+        description: 'Subir tambien crm/data, crm-care-comfort/data y ventas/data'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
   push:
     branches: [main]
     paths:
@@ -9,7 +18,9 @@ on:
       - 'guia.html'
       - 'CNAME'
       - 'assets/**'
+      - 'ventas/**'
       - 'crm/**'
+      - 'crm-care-comfort/**'
 
 jobs:
   deploy:
@@ -20,12 +31,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Preparar versión principal
+        env:
+          DEPLOY_RUNTIME_DATA: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_runtime_data == 'true' }}
         run: |
           mkdir -p public
           cp index.html public/index.html
           cp guia.html public/guia.html
           if [ -d assets ]; then cp -R assets public/; fi
-          if [ -d crm ]; then cp -R crm public/ && rm -rf public/crm/data; fi
+          if [ -d ventas ]; then cp -R ventas public/; fi
+          if [ -d crm ]; then cp -R crm public/; fi
+          if [ -d crm-care-comfort ]; then cp -R crm-care-comfort public/; fi
+          if [ "$DEPLOY_RUNTIME_DATA" != "true" ]; then
+            rm -rf public/ventas/data public/crm/data public/crm-care-comfort/data
+          fi
 
       - name: Deploy lifepluspetspain.com (versión completa)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -39,12 +57,19 @@ jobs:
           log-level: standard
 
       - name: Generar versión neutra (sin formulario, sin tienda)
+        env:
+          DEPLOY_RUNTIME_DATA: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_runtime_data == 'true' }}
         run: |
           mkdir -p neutro
           cp index.html neutro/index.html
           cp guia.html neutro/guia.html
           if [ -d assets ]; then cp -R assets neutro/; fi
-          if [ -d crm ]; then cp -R crm neutro/ && rm -rf neutro/crm/data; fi
+          if [ -d ventas ]; then cp -R ventas neutro/; fi
+          if [ -d crm ]; then cp -R crm neutro/; fi
+          if [ -d crm-care-comfort ]; then cp -R crm-care-comfort neutro/; fi
+          if [ "$DEPLOY_RUNTIME_DATA" != "true" ]; then
+            rm -rf neutro/ventas/data neutro/crm/data neutro/crm-care-comfort/data
+          fi
 
           python3 - <<'EOF'
           import re

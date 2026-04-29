@@ -3,37 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PETS Outreach CRM</title>
+    <title>Care &amp; Comfort CRM</title>
     <script
       src="../access-gate.js"
       data-code="1994"
-      data-key="crm"
+      data-key="crm-care-comfort"
       data-title="Acceso CRM"
-      data-subtitle="Introduce el codigo 1994 para acceder al CRM."
+      data-subtitle="Introduce el codigo 1994 para acceder al CRM de Care & Comfort."
     ></script>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="hero">
       <p class="eyebrow">LifePlus Pets</p>
-      <h1>PETS Outreach CRM</h1>
+      <h1>Care &amp; Comfort CRM</h1>
       <p class="subtitle">
-        Contactos de centros veterinarios, grupos y comunidades caninas con
-        seguimiento accionable.
+        CRM para clínicas veterinarias, tiendas de alimentación y comercios
+        pet-friendly centrado en Care &amp; Comfort.
       </p>
       <div class="hero-actions">
         <button id="exportCsvBtn" class="btn btn-primary">Exportar CSV</button>
         <button id="exportInteractionsBtn" class="btn btn-secondary">
           Exportar interacciones
-        </button>
-        <button id="importMonicaBtn" class="btn btn-secondary">
-          Importar Monica
-        </button>
-        <button id="importBelenBtn" class="btn btn-secondary">
-          Importar Belen
-        </button>
-        <button id="importBelenPdfBtn" class="btn btn-secondary">
-          Importar Belen PDF
         </button>
         <button id="importBarcelonaVetsBtn" class="btn btn-secondary">
           Importar Vets BCN
@@ -207,7 +198,7 @@
         <div class="table-header">
           <h2>Pipeline de contactos</h2>
           <div class="filters">
-            <input id="searchInput" placeholder="Buscar por nombre o telefono" />
+            <input id="searchInput" placeholder="Buscar por centro, ciudad o teléfono" />
             <select id="statusFilter">
               <option value="">Todos los estados del pipeline</option>
               <option value="nuevo">Nuevo</option>
@@ -223,13 +214,13 @@
             </select>
             <select id="ownerFilter">
               <option value="">Todos los responsables</option>
-              <option value="Monica">Monica</option>
-              <option value="Belen">Belen</option>
-              <option value="Barcelona">Barcelona</option>
+              <option value="Care &amp; Comfort">Care &amp; Comfort</option>
+              <option value="Peter">Peter</option>
+              <option value="Maika">Maika</option>
             </select>
             <input
               id="smsTemplateInput"
-              placeholder="Plantilla SMS: Hola {nombre_corto}, somos Peter y Maika de LifePlus..."
+              placeholder="Plantilla SMS: Hola {nombre_corto}, somos Peter y Maika de LifePlus Pets..."
             />
           </div>
         </div>
@@ -243,6 +234,7 @@
                 <th>Organizacion</th>
                 <th>Tipo</th>
                 <th>Telefono</th>
+                <th>Email</th>
                 <th>Contacto</th>
                 <th>Responsable</th>
                 <th>Pipeline</th>
@@ -262,6 +254,9 @@
           <p id="historyContactMeta" class="history-meta">
             Selecciona "Historial" en un contacto para registrar SMS,
             WhatsApp, llamadas y respuestas.
+          </p>
+          <p class="history-note">
+            Aquí puedes escribir exactamente lo que vas hablando con cada contacto: lo que dijiste, lo que respondió, la objeción, el siguiente paso y la fecha.
           </p>
 
           <form id="interactionForm" class="form-grid">
@@ -333,7 +328,7 @@
 
             <label>
               Responsable (upline)
-              <input id="interactionOwner" placeholder="Monica / Belen" />
+              <input id="interactionOwner" placeholder="Peter / Maika / Care &amp; Comfort" />
             </label>
 
             <label class="full-width">

@@ -84,6 +84,9 @@ Cambios aplicados:
 
 - ahora incluye trigger por `crm/**`.
 - copia `crm/` tanto en version principal como en neutra.
+- tambien despliega `ventas/**` y `crm-care-comfort/**`.
+- por defecto, los pushes normales NO suben `crm/data`, `crm-care-comfort/data` ni `ventas/data`, para no sobrescribir datos vivos editados online.
+- si hay que cargar una base inicial o reemplazar datos del servidor, lanzar el workflow manualmente (`workflow_dispatch`) con `deploy_runtime_data=true`.
 
 Sin este ajuste, el CRM no se subia al servidor aunque existiera en Git.
 
@@ -97,4 +100,3 @@ Sin este ajuste, el CRM no se subia al servidor aunque existiera en Git.
 - Filtro rapido por `owner` y por tareas vencidas.
 - Login real (backend) si se requiere seguridad fuerte.
 - Migracion futura de `contacts.json` a base de datos (MySQL/PostgreSQL) si aumenta el volumen.
-
