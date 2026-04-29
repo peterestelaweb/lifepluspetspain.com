@@ -295,10 +295,7 @@ function clearForm() {
   consentStatusInput.value = "no_aplica";
 }
 
-function editRecord(id) {
-  const item = contacts.find((contact) => contact.id === id);
-  if (!item) return;
-
+function populateContactForm(item) {
   recordIdInput.value = item.id || "";
   contactTypeInput.value = item.contact_type || "";
   organizationNameInput.value = item.organization_name || "";
@@ -319,6 +316,13 @@ function editRecord(id) {
   priorityInput.value = item.priority || "medium";
   retentionReviewAtInput.value = item.retention_review_at || "";
   sourceInput.value = item.source || "";
+}
+
+function editRecord(id) {
+  const item = contacts.find((contact) => contact.id === id);
+  if (!item) return;
+
+  populateContactForm(item);
   openHistory(id);
 }
 
@@ -707,9 +711,20 @@ function findContactById(id) {
   return contacts.find((item) => item.id === id);
 }
 
-function openHistory(id) {
+function openHistory(id, options = {}) {
+  const { populateForm = false, scrollToPanel = false } = options;
   selectedHistoryContactId = id;
+  const contact = findContactById(id);
+  if (populateForm && contact) populateContactForm(contact);
+  clearInteractionForm();
   renderHistoryPanel();
+  if (scrollToPanel) {
+    document.getElementById("historyPanel")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    interactionSummaryInput.focus({ preventScroll: true });
+  }
 }
 
 function renderHistoryPanel() {
@@ -1159,7 +1174,9 @@ tableBody.addEventListener("click", (event) => {
   const id = target.dataset.id;
   if (!action || !id) return;
 
-  if (action === "history") openHistory(id);
+  if (action === "history") {
+    openHistory(id, { populateForm: true, scrollToPanel: true });
+  }
   if (action === "sms") sendSmsForContact(id);
   if (action === "whatsapp") sendWhatsAppForContact(id);
   if (action === "edit") editRecord(id);
