@@ -87,6 +87,7 @@ Cambios aplicados:
 - tambien despliega `ventas/**` y `crm-care-comfort/**`.
 - por defecto, los pushes normales NO suben `crm/data`, `crm-care-comfort/data` ni `ventas/data`, para no sobrescribir datos vivos editados online.
 - si hay que cargar una base inicial o reemplazar datos del servidor, lanzar el workflow manualmente (`workflow_dispatch`) con `deploy_runtime_data=true`.
+- para traer a GitHub una copia de los datos editados online, lanzar `Backup runtime data from Banahosting`. Descarga `crm/data`, `crm-care-comfort/data` y `ventas/data`, valida los JSON y commitea solo si hay cambios.
 
 Sin este ajuste, el CRM no se subia al servidor aunque existiera en Git.
 

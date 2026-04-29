@@ -1,0 +1,61 @@
+name: Backup runtime data from Banahosting
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar cliente FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Descargar datos vivos del servidor
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          mkdir -p crm/data crm-care-comfort/data ventas/data
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_SERVER" <<'EOF'
+          set ftp:ssl-allow no
+          set ssl:verify-certificate no
+          lcd crm/data
+          cd /lifepluspetspain.com/crm/data
+          mget -c *
+          lcd ../../crm-care-comfort/data
+          cd /lifepluspetspain.com/crm-care-comfort/data
+          mget -c *
+          lcd ../../ventas/data
+          cd /lifepluspetspain.com/ventas/data
+          mget -c *
+          bye
+          EOF
+
+      - name: Validar JSON descargados
+        run: |
+          python3 -m json.tool crm/data/contacts.json >/dev/null
+          python3 -m json.tool crm-care-comfort/data/contacts.json >/dev/null
+          python3 -m json.tool ventas/data/notes.json >/dev/null
+
+      - name: Commit de backup si hay cambios
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add crm/data crm-care-comfort/data ventas/data
+          if git diff --cached --quiet; then
+            echo "No hay cambios de datos que guardar."
+            exit 0
+          fi
+          git commit -m "chore(data): backup runtime data from Banahosting"
+          git push
