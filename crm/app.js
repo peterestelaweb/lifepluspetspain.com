@@ -484,8 +484,14 @@ function renderTable() {
         const smsLabel = attempts > 0 ? `SMS ${dots}${todayMark}` : "SMS";
         const smsBtn = `<button class="mini sms-btn ${attemptClass}" data-action="sms" data-id="${item.id}">${smsLabel}</button>`;
         const isOverdue = item.next_step_due && item.next_step_due < today();
+        const rowClasses = [
+          isOverdue ? "overdue" : "",
+          item.id === selectedHistoryContactId ? "selected-contact" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
         return `
-        <tr class="${isOverdue ? "overdue" : ""}">
+        <tr class="${rowClasses}">
           <td class="cell-actions">
             <div class="action-group">
               <button class="mini history-btn" data-action="history" data-id="${item.id}">Historial</button>
@@ -741,7 +747,12 @@ function renderHistoryPanel() {
     return;
   }
 
-  historyContactMeta.textContent = `${contact.organization_name} · ${contact.contact_name || "Sin persona de contacto"} · ${contact.phone || "-"}`;
+  historyContactMeta.innerHTML = `
+    <span class="active-contact-label">Contacto activo</span>
+    <strong>${escapeHtml(contact.organization_name)}</strong>
+    <span>${escapeHtml(contact.phone || "-")}</span>
+    <span>${escapeHtml(contact.email || "Sin email")}</span>
+  `;
   interactionOwnerInput.value = contact.owner || "";
 
   const interactions = Array.isArray(contact.interactions)

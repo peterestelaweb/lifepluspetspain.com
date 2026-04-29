@@ -333,8 +333,11 @@ td.cell-actions {
 
 .history-panel {
   margin-top: 1rem;
-  border-top: 1px solid var(--line);
-  padding-top: 0.9rem;
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--brand);
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
 }
 
 .history-panel h3 {
@@ -343,9 +346,28 @@ td.cell-actions {
 }
 
 .history-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
   margin: 0 0 0.75rem;
   font-size: 0.84rem;
   color: var(--ink-soft);
+}
+
+.history-meta strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.active-contact-label {
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .history-actions {
@@ -379,6 +401,14 @@ td.cell-actions {
 
 tr.overdue td {
   background: #fff5f5;
+}
+
+tr.selected-contact td {
+  background: #ecfdf5;
+}
+
+tr.selected-contact td.cell-actions {
+  box-shadow: inset 4px 0 0 var(--brand), 1px 0 0 var(--line);
 }
 
 tr.overdue .cell-next,
