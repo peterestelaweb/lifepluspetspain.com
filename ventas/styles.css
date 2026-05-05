@@ -138,7 +138,7 @@ a {
 
 .tabs-inner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .tab {
@@ -267,6 +267,10 @@ h2 {
   border-left: 8px solid var(--lime);
 }
 
+.metric-email {
+  border-left: 8px solid var(--blue);
+}
+
 .metric-obj {
   border-left: 8px solid var(--cherry);
 }
@@ -296,6 +300,23 @@ h2 {
 .stack {
   display: grid;
   gap: 14px;
+}
+
+.compliance-note {
+  margin: 0 0 16px;
+  border: 1px solid rgba(73, 120, 166, 0.24);
+  border-left: 8px solid var(--blue);
+  border-radius: 16px;
+  background: #f2f7fb;
+  padding: 14px 16px;
+  color: #314946;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.compliance-note strong {
+  color: var(--teal);
 }
 
 .script-card {
